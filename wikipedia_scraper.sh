@@ -24,7 +24,12 @@ addNewArticleToCsv() {
 
 
     #Get the json with the content
-    content=$(curl -s "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1&titles=$random_title" | grep -oP "\"extract\":\"(.*?)\"" | awk -F\"extract\": '{print $NF}')
+    json=$(curl -s "https://en.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&explaintext&redirects=1&titles=$random_title")
+    pageId=$(echo $json | jq '.query.pages | keys' | jq '.[0]')
+
+    content=$(echo $json | python3 -c "import sys, json; print(json.load(sys.stdin)['query']['pages'][$pageId]['extract'])")
+    content=$(echo $content | sed 's/\r$//')
+
     [[ "$1" == "verbose" ]] && echo "Content"
     [[ "$1" == "verbose" ]] && echo "=============="
     [[ "$1" == "verbose" ]] && echo "$content"
