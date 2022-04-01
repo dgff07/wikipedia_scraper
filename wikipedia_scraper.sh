@@ -28,14 +28,14 @@ addNewArticleToCsv() {
     pageId=$(echo $json | jq '.query.pages | keys' | jq '.[0]')
 
     content=$(echo $json | python3 -c "import sys, json; print(json.load(sys.stdin)['query']['pages'][$pageId]['extract'])")
-    content=$(echo $content | sed 's/\r$//')
+    content=$(echo $content | sed 's/\r$//' | tr "\"" "'")
 
     [[ "$1" == "verbose" ]] && echo "Content"
     [[ "$1" == "verbose" ]] && echo "=============="
     [[ "$1" == "verbose" ]] && echo "$content"
 
     #Write to CSV
-    echo "\"$categories\",$content" >> $CSV_FILE_NAME
+    echo "\"$categories\",\"$content\"" >> $CSV_FILE_NAME
     
 }
 
